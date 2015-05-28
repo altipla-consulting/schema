@@ -153,6 +153,30 @@ func (t *Table) AssignPrimaryKey(ctx context.Context, name string) error {
 	return nil
 }
 
+// AddUnique adds a new unique index to a column.
+func (t *Table) AddUnique(ctx context.Context, column string) error {
+	conn := database.FromContext(ctx)
+
+	statement := fmt.Sprintf("ALTER TABLE `%s` ADD UNIQUE `%s`", t.name, column)
+	if _, err := conn.DB.Exec(statement); err != nil {
+		return errors.Trace(err)
+	}
+
+	return nil
+}
+
+// DropUnique removes the unique index of a column.
+func (t *Table) DropUnique(ctx context.Context, column string) error {
+	conn := database.FromContext(ctx)
+
+	statement := fmt.Sprintf("ALTER TABLE `%s` DROP INDEX `%s`", t.name, column)
+	if _, err := conn.DB.Exec(statement); err != nil {
+		return errors.Trace(err)
+	}
+
+	return nil
+}
+
 // Rename changes the name of the table to a new one.
 func (t *Table) Rename(ctx context.Context, name string) error {
 	conn := database.FromContext(ctx)
