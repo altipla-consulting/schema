@@ -157,7 +157,7 @@ func (t *Table) AssignPrimaryKey(ctx context.Context, name string) error {
 func (t *Table) AddUnique(ctx context.Context, column string) error {
 	conn := database.FromContext(ctx)
 
-	statement := fmt.Sprintf("ALTER TABLE `%s` ADD UNIQUE `%s`", t.name, column)
+	statement := fmt.Sprintf("ALTER TABLE `%s` ADD UNIQUE INDEX (`%s`)", t.name, column)
 	if _, err := conn.DB.Exec(statement); err != nil {
 		return errors.Trace(err)
 	}
