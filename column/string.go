@@ -40,7 +40,7 @@ func (col *StringColumn) PrimaryKey() *StringColumn {
 
 // After sets the column next to the one we're inserting as a reference point
 // for the update/create column.
-func (col *StringColumn) After(name string) *IntegerColumn {
+func (col *StringColumn) After(name string) *StringColumn {
 	col.modifiers = append(col.modifiers, fmt.Sprintf("AFTER `%s`", name))
 	return col
 }
