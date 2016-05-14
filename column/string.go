@@ -15,20 +15,27 @@ type StringColumn struct {
 // String creates a new string column.
 func String(name string, length int) *StringColumn {
 	return &StringColumn{
-		name:   name,
-		length: length,
+		name:      name,
+		length:    length,
+		modifiers: []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *StringColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *StringColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` VARCHAR(%d) %s", col.name, col.length, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *StringColumn) NotNull() *StringColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *StringColumn) Nullable() *StringColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }
 

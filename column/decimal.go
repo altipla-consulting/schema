@@ -18,17 +18,24 @@ func Decimal(name string, length, decimalPositions int) *DecimalColumn {
 		name:             name,
 		length:           length,
 		decimalPositions: decimalPositions,
+		modifiers:        []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *DecimalColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *DecimalColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` DECIMAL(%d, %d) %s", col.name, col.length, col.decimalPositions, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *DecimalColumn) NotNull() *DecimalColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *DecimalColumn) Nullable() *DecimalColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }

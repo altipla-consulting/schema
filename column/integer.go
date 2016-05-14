@@ -15,20 +15,27 @@ type IntegerColumn struct {
 // Integer creates a new integer column.
 func Integer(name string, length int) *IntegerColumn {
 	return &IntegerColumn{
-		name:   name,
-		length: length,
+		name:      name,
+		length:    length,
+		modifiers: []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *IntegerColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *IntegerColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` INT(%d) %s", col.name, col.length, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *IntegerColumn) NotNull() *IntegerColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *IntegerColumn) Nullable() *IntegerColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }
 

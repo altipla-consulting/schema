@@ -16,8 +16,8 @@ func Timestamp(name string) *TimestampColumn {
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *TimestampColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *TimestampColumn) SQL() string {
 	return fmt.Sprintf("`%s` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00'", col.name)
 }
 

@@ -14,18 +14,25 @@ type BooleanColumn struct {
 // Boolean creates a new boolean column.
 func Boolean(name string) *BooleanColumn {
 	return &BooleanColumn{
-		name: name,
+		name:      name,
+		modifiers: []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *BooleanColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *BooleanColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` TINYINT(1) %s", col.name, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *BooleanColumn) NotNull() *BooleanColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *BooleanColumn) Nullable() *BooleanColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }

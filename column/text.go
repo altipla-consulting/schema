@@ -14,18 +14,25 @@ type TextColumn struct {
 // Text creates a new text column.
 func Text(name string) *TextColumn {
 	return &TextColumn{
-		name: name,
+		name:      name,
+		modifiers: []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *TextColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *TextColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` TEXT %s", col.name, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *TextColumn) NotNull() *TextColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *TextColumn) Nullable() *TextColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }

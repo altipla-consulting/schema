@@ -14,18 +14,25 @@ type LongTextColumn struct {
 // LongText creates a new large ASCII text column.
 func LongText(name string) *LongTextColumn {
 	return &LongTextColumn{
-		name: name,
+		name:      name,
+		modifiers: []string{"NOT NULL"},
 	}
 }
 
-// CreateSQL generates the SQL needed to create the column.
-func (col *LongTextColumn) CreateSQL() string {
+// SQL generates the SQL needed to create the column.
+func (col *LongTextColumn) SQL() string {
 	modifiers := strings.Join(col.modifiers, " ")
 	return fmt.Sprintf("`%s` LONGTEXT %s", col.name, modifiers)
 }
 
-// NotNull flags the column so it can't contain NULLs.
-func (col *LongTextColumn) NotNull() *LongTextColumn {
-	col.modifiers = append(col.modifiers, "NOT NULL")
+// Nullable allows the column to contain NULLs.
+func (col *LongTextColumn) Nullable() *LongTextColumn {
+	for i, m := range col.modifiers {
+		if m == "NOT NULL" {
+			col.modifiers = append(col.modifiers[:i], col.modifiers[i+1:]...)
+			break
+		}
+	}
+
 	return col
 }
