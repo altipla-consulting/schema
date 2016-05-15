@@ -21,13 +21,13 @@ func (col *TimestampColumn) SQL() string {
 	return fmt.Sprintf("`%s` TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00'", col.name)
 }
 
-// CreatedTimestamp creates a new column called "created_at" thought to store
+// CreatedTimestamp creates a new column called "created_at" meant to store
 // the creation timestamp of the tuple.
 func CreatedTimestamp() *TimestampColumn {
 	return Timestamp("created_at")
 }
 
-// UpdatedTimestamp creates a new column called "updated_at" thought to store
+// UpdatedTimestamp creates a new column called "updated_at" meant to store
 // the update timestamp of the tuple.
 func UpdatedTimestamp() *TimestampColumn {
 	return Timestamp("updated_at")

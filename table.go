@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/altipla-consulting/schema/column"
-
 	"github.com/juju/errors"
 )
 
@@ -20,8 +18,15 @@ func NewConnection(db *sql.DB) *Connection {
 	return &Connection{db: db}
 }
 
+// Column it's the common interface between all type of columns.
+type Column interface {
+
+	// SQL generates the SQL needed to create the column.
+	SQL() string
+}
+
 // CreateTable creates a new table.
-func (conn *Connection) CreateTable(name string, columns []column.Column) error {
+func (conn *Connection) CreateTable(name string, columns []Column) error {
 	lines := make([]string, len(columns))
 	for i, col := range columns {
 		lines[i] = col.SQL()
@@ -62,7 +67,7 @@ func (conn *Connection) TableExists(name string) (bool, error) {
 }
 
 // CreateTableIfNotExists creates the table if it is not already present.
-func (conn *Connection) CreateTableIfNotExists(name string, columns []column.Column) error {
+func (conn *Connection) CreateTableIfNotExists(name string, columns []Column) error {
 	exists, err := conn.TableExists(name)
 	switch {
 	case err != nil:
@@ -87,7 +92,7 @@ func (conn *Connection) RenameColumn(tableName, oldColumnName, columnName, colum
 }
 
 // AddColumn creates a new column in a table that already exists.
-func (conn *Connection) AddColumn(tableName string, col column.Column) error {
+func (conn *Connection) AddColumn(tableName string, col Column) error {
 	stmt := fmt.Sprintf("ALTER TABLE `%s` ADD %s", tableName, col.SQL())
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
