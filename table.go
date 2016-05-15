@@ -10,12 +10,25 @@ import (
 
 // Connection to the DB.
 type Connection struct {
-	db *sql.DB
+	db           *sql.DB
+	tablesEngine string
 }
 
 // NewConnection stores a connection to a DB to apply schema changes to it.
 func NewConnection(db *sql.DB) *Connection {
-	return &Connection{db: db}
+	return &Connection{
+		db:           db,
+		tablesEngine: "InnoDB",
+	}
+}
+
+// NewTestConnection stores a connection to a DB to apply schema changes to it. All
+// tables created with this connection will reside in memory for tests.
+func NewTestConnection(db *sql.DB) *Connection {
+	return &Connection{
+		db:           db,
+		tablesEngine: "MEMORY",
+	}
 }
 
 // Column it's the common interface between all type of columns.
@@ -32,7 +45,7 @@ func (conn *Connection) CreateTable(name string, columns []Column) error {
 		lines[i] = col.SQL()
 	}
 
-	stmt := fmt.Sprintf("CREATE TABLE `%s` (%s) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin", name, strings.Join(lines, ","))
+	stmt := fmt.Sprintf("CREATE TABLE `%s` (%s) ENGINE=%s DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin", name, strings.Join(lines, ","), conn.tablesEngine)
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
 	}
