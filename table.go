@@ -136,8 +136,8 @@ func (conn *Connection) DropPrimaryKey(name string) error {
 
 // AssignPrimaryKey sets the new primary key of the table. It should have been dropped
 // before, or not exist previously.
-func (conn *Connection) AssignPrimaryKey(tableName string, columnName []string) error {
-	stmt := fmt.Sprintf("ALTER TABLE `%s` ADD PRIMARY KEY (`%s`)", tableName, columnName)
+func (conn *Connection) AssignPrimaryKey(tableName string, columnNames []string) error {
+	stmt := fmt.Sprintf("ALTER TABLE `%s` ADD PRIMARY KEY (%s)", tableName, quoteCols(columnNames))
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
 	}
@@ -146,8 +146,8 @@ func (conn *Connection) AssignPrimaryKey(tableName string, columnName []string) 
 }
 
 // AddUnique adds a new unique index to a column.
-func (conn *Connection) AddUnique(tableName, columnName string) error {
-	stmt := fmt.Sprintf("ALTER TABLE `%s` ADD UNIQUE INDEX (`%s`)", tableName, columnName)
+func (conn *Connection) AddUnique(tableName, indexName string, columnNames []string) error {
+	stmt := fmt.Sprintf("ALTER TABLE `%s` ADD UNIQUE INDEX %s(%s)", tableName, indexName, quoteCols(columnNames))
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
 	}
@@ -156,8 +156,8 @@ func (conn *Connection) AddUnique(tableName, columnName string) error {
 }
 
 // DropUnique removes the unique index of a column.
-func (conn *Connection) DropUnique(tableName, columnName string) error {
-	stmt := fmt.Sprintf("ALTER TABLE `%s` DROP INDEX `%s`", tableName, columnName)
+func (conn *Connection) DropUnique(tableName, indexName string) error {
+	stmt := fmt.Sprintf("ALTER TABLE `%s` DROP INDEX %s", tableName, indexName)
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
 	}
@@ -173,4 +173,12 @@ func (conn *Connection) RenameTable(oldName, name string) error {
 	}
 
 	return nil
+}
+
+func quoteCols(cols []string) string {
+	result := []string{}
+	for _, col := range cols {
+		result = append(result, fmt.Sprintf("`%s`", col))
+	}
+	return strings.Join(result, ",")
 }
