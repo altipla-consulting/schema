@@ -114,6 +114,16 @@ func (conn *Connection) AddColumn(tableName string, col Column) error {
 	return nil
 }
 
+// AlterColumn changes the properties of a column. It needs the current type of the column.
+func (conn *Connection) AlterColumn(tableName, columnName, columnType string) error {
+	stmt := fmt.Sprintf("ALTER TABLE `%s` MODIFY `%s` `%s`", tableName, columnName, columnType)
+	if _, err := conn.db.Exec(stmt); err != nil {
+		return errors.Trace(err)
+	}
+
+	return nil
+}
+
 // DropColumn removes a column from a table.
 func (conn *Connection) DropColumn(tableName, columnName string) error {
 	stmt := fmt.Sprintf("ALTER TABLE `%s` DROP COLUMN %s", tableName, columnName)
