@@ -116,7 +116,7 @@ func (conn *Connection) AddColumn(tableName string, col Column) error {
 
 // AlterColumn changes the properties of a column. It needs the current type of the column.
 func (conn *Connection) AlterColumn(tableName, columnName, columnType string) error {
-	stmt := fmt.Sprintf("ALTER TABLE `%s` CHANGE `%s` `%s`", tableName, columnName, columnType)
+	stmt := fmt.Sprintf("ALTER TABLE `%s` MODIFY `%s` `%s`", tableName, columnName, columnType)
 	if _, err := conn.db.Exec(stmt); err != nil {
 		return errors.Trace(err)
 	}
